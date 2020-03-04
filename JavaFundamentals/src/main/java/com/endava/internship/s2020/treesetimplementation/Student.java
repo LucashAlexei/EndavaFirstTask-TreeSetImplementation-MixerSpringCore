@@ -1,6 +1,7 @@
 package com.endava.internship.s2020.treesetimplementation;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 
 public class Student implements Comparable<Student> //TODO consider implementing any interfaces necessary for your collection
@@ -60,3 +61,4 @@ public class Student implements Comparable<Student> //TODO consider implementing
         placed before the younger student in an ordered student list.
     */
 }
+

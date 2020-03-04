@@ -2,19 +2,16 @@ package com.endava.internship.s2020.treesetimplementation;
 
 import java.util.*;
 
-public class StudentSet extends Student implements Set<Student> {
+public class StudentSet<A> implements Set<A> {
 
     //private Set<Student> treeSet = new TreeSet<Student>();
     int count = 0;
     boolean boolCont;
-    boolean boolAdd;
     boolean boolAddAll;
-    private transient NavigableMap<Student,Object> map;
 
+    private A[] setTree = (A[]) new Object[16];
 
-    private Student setTree[] = new Student[16];
-
-    StudentSet(){
+    StudentSet() {
     }
 
     @Override
@@ -27,24 +24,16 @@ public class StudentSet extends Student implements Set<Student> {
         return (count == 0);
     }
 
-    public void print() {
-        int i = 0;
-        do {
-            System.out.println("!: " + setTree[i]);
-            i++;
-        }while(setTree[i]!=null);
-    }
 
     @Override
     public boolean contains(Object o) {
-        for(int i=0;i<setTree.length;i++) {
+        for (int i = 0; i < setTree.length; i++) {
             if (setTree[i] != null) {
                 //System.out.println("collection: " + setTree[i].hashCode() + " o: " + o.hashCode());
-                if (o.hashCode() == setTree[i].hashCode()){
+                if (o.equals (setTree[i])) {
                     boolCont = true;
                     break;
-                }
-                else
+                } else
                     boolCont = false;
             }
         }
@@ -52,37 +41,38 @@ public class StudentSet extends Student implements Set<Student> {
     }
 
     @Override
-    public Iterator<Student> iterator() {
+    public Iterator<A> iterator() {
 
         LinkedList<Student> list = new LinkedList<>();
-        for(int i=0;i<setTree.length;i++){
-            if(setTree[i]!=null){
-                list.add(setTree[i]);
+        for (int i = 0; i < setTree.length; i++) {
+            if (setTree[i] != null) {
+                list.add((Student) setTree[i]);
             }
         }
         Iterator<Student> iter = list.iterator();
         list.sort(Comparator.comparing(Student::getName).thenComparing(Student::getDateOfBirth));
 
-        while (iter.hasNext()){
-            System.out.println("Iter: "+iter.next());
-        }
-        return iter;
+//        while (iter.hasNext()){
+//            System.out.println("Iter: "+iter.next());
+//        }
+        return (Iterator<A>) iter;
     }
 
     @Override
-    public Student[] toArray() {
+    public A[] toArray() {
         Student arr[] = new Student[count];
         LinkedList<Student> list = new LinkedList<>();
-        for(int i=0;i<count;i++){
-            if(setTree[i]!=null){
-                list.add(setTree[i]);
+        for (int i = 0; i < count+1; i++) {
+            if (setTree[i] != null) {
+                list.add((Student) setTree[i]);
             }
         }
+
         list.sort(Comparator.comparing(Student::getName).thenComparing(Student::getDateOfBirth));
-        for (int i =0; i < list.size(); i++)
+        for (int i = 0; i < list.size(); i++)
             arr[i] = list.get(i);
 
-        return arr;
+        return (A[]) arr;
     }
 
     @Override
@@ -92,24 +82,26 @@ public class StudentSet extends Student implements Set<Student> {
     }
 
     @Override
-    public boolean add(Student student) {
-        for(int i =0; i<count; i++){
-            if(setTree[i].equals(student)){
+    public boolean add(A student) {
+        for (int i = 0; i < count; i++) {
+            if (setTree[i].equals(student)) {
                 return false;
-                }
             }
-            setTree[count] = student;
-            count++;
-            return true;
+        }
+        setTree[count] = student;
+        count++;
+        return true;
     }
 
     @Override
     public boolean remove(Object o) {
-        for(int i = 0;i<setTree.length;i++){
-            if(setTree[i].equals(o)){
-                setTree[i]=null;
-                count--;
-                return true;
+        if(contains(o)) {
+            for (int i = 0; i < setTree.length; i++) {
+                    if (setTree[i].equals(o)) {
+                        setTree[i] = null;
+                        count--;
+                        return true;
+                }
             }
         }
         return false;
@@ -117,20 +109,18 @@ public class StudentSet extends Student implements Set<Student> {
 
     @Override
     public boolean containsAll(Collection<?> collection) {
-        //Ignore this for homework          ?
+        //Ignore this for homework
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean addAll(Collection<? extends Student> collection) {
-        System.out.println("count before: " + count);
-        for(Student st: collection){
-            for(int i =0; i<count; i++){
-                if(setTree[i].equals(st)){
-                    return boolAddAll=false;
+    public boolean addAll(Collection<? extends A> collection) {
+        for (A st : collection) {
+            for (int i = 0; i < count; i++) {
+                if (setTree[i].equals(st)) {
+                    return boolAddAll = false;
                 }
             }
-            System.out.println("before: " + count);
             setTree[count++] = st;
             boolAddAll = true;
         }
@@ -151,6 +141,9 @@ public class StudentSet extends Student implements Set<Student> {
 
     @Override
     public void clear() {
+        count = 0;
         Arrays.fill(setTree, null);
     }
+
 }
+
