@@ -7,6 +7,7 @@ public class StudentSet implements Set<Student> {
     int count = 0;
     boolean boolRemove;
     boolean boolAddAll;
+
     Node root;
 
     StudentSet() {
@@ -183,7 +184,7 @@ public class StudentSet implements Set<Student> {
             array[k] = iter2.next();
             k++;
         }
-        return array;
+        return (Student[]) array;
     }
 
     @Override
@@ -204,6 +205,7 @@ public class StudentSet implements Set<Student> {
             addRecursive(root, st);
             count++;
         }
+
         return boolAddAll;
     }
 

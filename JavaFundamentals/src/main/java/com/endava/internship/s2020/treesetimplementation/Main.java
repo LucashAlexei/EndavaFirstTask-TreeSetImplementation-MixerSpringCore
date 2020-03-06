@@ -37,7 +37,7 @@ public class Main {
 
         System.out.println("TreeSet Size: " + treeSet.size());
 
-        TreeSet<Student> tmp = new TreeSet();
+        TreeSet<Student> tmp = new TreeSet<>();
         tmp.add(st3);
         tmp.add(st);
         tmp.add(st5);
