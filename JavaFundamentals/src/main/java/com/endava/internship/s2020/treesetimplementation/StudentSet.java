@@ -2,16 +2,27 @@ package com.endava.internship.s2020.treesetimplementation;
 
 import java.util.*;
 
-public class StudentSet<A> implements Set<A> {
+public class StudentSet implements Set<Student> {
 
-    //private Set<Student> treeSet = new TreeSet<Student>();
     int count = 0;
-    boolean boolCont;
+    boolean boolRemove;
     boolean boolAddAll;
-
-    private A[] setTree = (A[]) new Object[16];
+    Node root;
 
     StudentSet() {
+    }
+
+    //inner Node class
+    static class Node {
+        Student student;
+        Node left;
+        Node right;
+
+        Node(Student student) {
+            this.student = student;
+            right = null;
+            left = null;
+        }
     }
 
     @Override
@@ -24,55 +35,155 @@ public class StudentSet<A> implements Set<A> {
         return (count == 0);
     }
 
+    public int compareObjects(Node current, Object student){
+        return student.toString().compareTo(current.student.toString());
+    }
 
     @Override
     public boolean contains(Object o) {
-        for (int i = 0; i < setTree.length; i++) {
-            if (setTree[i] != null) {
-                //System.out.println("collection: " + setTree[i].hashCode() + " o: " + o.hashCode());
-                if (o.equals (setTree[i])) {
-                    boolCont = true;
-                    break;
-                } else
-                    boolCont = false;
+            return containsRecursive(root, o);
+    }
+
+    private boolean containsRecursive(Node current, Object student) {
+        if (current == null) {
+            return false;
+        }
+        if (student.equals(current.student)) {
+            return true;
+        }
+        else if(compareObjects(current,student) < 0){
+            return containsRecursive(current.left, student);
+        }
+        else if(compareObjects(current,student) > 0)
+            return containsRecursive(current.right, student);
+
+        return true;
+    }
+
+    public Node addRecursive(Node current, Student student){
+        if(current==null){
+            return new Node(student);
+        }
+
+        int date = student.getDateOfBirth().compareTo(current.student.getDateOfBirth());
+
+        if(compareObjects(current, student)<0){
+            current.left = addRecursive(current.left,student);
+
+        }
+        else if(compareObjects(current, student)>0){
+            current.right = addRecursive(current.right, student);
+
+        }else {
+            if (date < 0) {
+                current.left = addRecursive(current.left, student);
+
+            } else if (date > 0){
+                current.right = addRecursive(current.right, student);
+            }
+            else{
+                count--;
+                return current;
             }
         }
-        return boolCont;
+        return current;
+    }
+    @Override
+    public boolean add(Student student) {
+        root = addRecursive(root, student);
+        count++;
+        return true;
+    }
+
+    public void print(){
+        printRecursive(root);
+    }
+
+    public void printRecursive(Node root) {
+        if (root != null) {
+            printRecursive(root.left);
+            System.out.println("Tree: "+ root.student);
+            printRecursive(root.right);
+        }
+    }
+
+    private Node deleteRecursive(Node current, Object student) {
+        if (current == null) {
+            return null;
+        }
+
+        if (student.equals(current.student)) {
+            count--;
+            boolRemove = true;
+            if (current.left == null && current.right == null) {
+                return null;
+            }
+            if (current.right == null) {
+                return current.left;
+            }
+            if (current.left == null) {
+                return current.right;
+            }
+        }
+        if (compareObjects(current, student) < 0) {
+            boolRemove = false;
+            current.left = deleteRecursive(current.left, student);
+            return current;
+        }
+        current.right = deleteRecursive(current.right, student);
+        return current;
     }
 
     @Override
-    public Iterator<A> iterator() {
-
-        LinkedList<Student> list = new LinkedList<>();
-        for (int i = 0; i < setTree.length; i++) {
-            if (setTree[i] != null) {
-                list.add((Student) setTree[i]);
-            }
-        }
-        Iterator<Student> iter = list.iterator();
-        list.sort(Comparator.comparing(Student::getName).thenComparing(Student::getDateOfBirth));
-
-//        while (iter.hasNext()){
-//            System.out.println("Iter: "+iter.next());
-//        }
-        return (Iterator<A>) iter;
+    public boolean remove(Object student) {
+        root = deleteRecursive(root, student);
+        return boolRemove;
     }
 
     @Override
-    public A[] toArray() {
-        Student arr[] = new Student[count];
-        LinkedList<Student> list = new LinkedList<>();
-        for (int i = 0; i < count+1; i++) {
-            if (setTree[i] != null) {
-                list.add((Student) setTree[i]);
+    public Iterator<Student> iterator() {
+        return new Iterator<Student>() {
+            Stack<Student> stack = new Stack<Student>();
+            int check = 0;
+
+            @Override
+            public boolean hasNext() {
+                if(check == 0){
+                    iter(root);
+                    check++;
+                }
+                return !stack.empty();
             }
+
+            private void iter(Node root){
+                if(root == null){
+                    return;
+                }
+                iter(root.right);
+                if(root.student!=null) {
+                    stack.push(root.student);
+                }
+                iter(root.left);
+            }
+
+            @Override
+            public Student next() {
+                return stack.pop();
+            }
+        };
+    }
+
+    @Override
+    public Student[] toArray() {
+        Student[] array = new Student[count];
+
+        int k=0;
+        Iterator<Student> iter2 = this.iterator();
+        while(iter2.hasNext()) {
+            array[k] = iter2.next();
+            k++;
         }
-
-        list.sort(Comparator.comparing(Student::getName).thenComparing(Student::getDateOfBirth));
-        for (int i = 0; i < list.size(); i++)
-            arr[i] = list.get(i);
-
-        return (A[]) arr;
+        return array;
     }
 
     @Override
@@ -82,47 +193,16 @@ public class StudentSet<A> implements Set<A> {
     }
 
     @Override
-    public boolean add(A student) {
-        for (int i = 0; i < count; i++) {
-            if (setTree[i].equals(student)) {
-                return false;
-            }
-        }
-        setTree[count] = student;
-        count++;
-        return true;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        if(contains(o)) {
-            for (int i = 0; i < setTree.length; i++) {
-                    if (setTree[i].equals(o)) {
-                        setTree[i] = null;
-                        count--;
-                        return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
     public boolean containsAll(Collection<?> collection) {
         //Ignore this for homework
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean addAll(Collection<? extends A> collection) {
-        for (A st : collection) {
-            for (int i = 0; i < count; i++) {
-                if (setTree[i].equals(st)) {
-                    return boolAddAll = false;
-                }
-            }
-            setTree[count++] = st;
-            boolAddAll = true;
+    public boolean addAll(Collection<? extends Student> collection) {
+        for (Student st : collection) {
+            addRecursive(root, st);
+            count++;
         }
         return boolAddAll;
     }
@@ -139,11 +219,19 @@ public class StudentSet<A> implements Set<A> {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void clear() {
-        count = 0;
-        Arrays.fill(setTree, null);
+    public void clearRecursive(Node current){
+        if(current == null){
+            return;
+        }
+        clearRecursive(current.right);
+        current.student=null;
+        clearRecursive(current.left);
     }
 
+    @Override
+    public void clear() {
+       clearRecursive(root);
+       count=0;
+    }
 }
 

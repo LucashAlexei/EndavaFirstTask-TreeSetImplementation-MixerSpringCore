@@ -1,10 +1,7 @@
 package com.endava.internship.s2020.treesetimplementation;
 
 import java.time.LocalDate;
-import java.time.Month;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.TreeSet;
 
 public class Main {
@@ -20,35 +17,53 @@ public class Main {
         Student st5 = new Student("Anton", LocalDate.of(1998,5,22),"Friend");
         Student st6 = new Student("Alexei", LocalDate.of(1998,4,15),"Apple");
 
-        StudentSet<Student> treeSet = new StudentSet<>();
+        StudentSet treeSet = new StudentSet();
+
+        treeSet.add(st3);
+        treeSet.add(st3);
+        treeSet.add(st3);
+        //treeSet.add(st4);
+        //treeSet.add(st5);
         treeSet.add(st);
         treeSet.add(st2);
-        treeSet.add(st3);
-        treeSet.add(st4);
-        treeSet.add(st5);
         treeSet.add(st6);
+        treeSet.add(st4);
 
-        TreeSet<Student> tmp = new TreeSet();
-        tmp.add(st);
-        tmp.add(st5);
-        //adding tmp collection in treeSet
-        treeSet.addAll(tmp);
-
-        //iterator output
         Iterator<Student> iter = treeSet.iterator();
-        while(iter.hasNext() ) {
-                j++;
-                System.out.println(j +")"+iter.next());
+        while(iter.hasNext()) {
+            j++;
+            System.out.println(j +") "+iter.next());
         }
 
-        System.out.println("\nSize: "+ treeSet.size());
+        System.out.println("TreeSet Size: " + treeSet.size());
+
+        TreeSet<Student> tmp = new TreeSet();
+        tmp.add(st3);
+        tmp.add(st);
+        tmp.add(st5);
+        tmp.add(st2);
+        treeSet.add(st3);
+        //adding tmp collection in treeSet
+        System.out.println("Count before: " + treeSet.size());
+        treeSet.addAll(tmp);
+        System.out.println("Count after: " + treeSet.size());
+        //iterator output
+        System.out.println("\n");
+
+        Iterator<Student> iter2 = treeSet.iterator();
+        j=0;
+        while(iter2.hasNext()) {
+            j++;
+            System.out.println(j +") "+iter2.next());
+        }
+
+        System.out.println("\nTreeSet Size: " +  treeSet.size());
         System.out.println("\nContains obj? " + treeSet.contains(st2));
 
         System.out.println("\nRemoving student: "+st4.toString());
-        treeSet.remove(st4);
+        System.out.println(treeSet.remove(st4));
 
-
-        Student arr[] = (Student[]) treeSet.toArray();
+        Student arr[] = treeSet.toArray();
         System.out.println("\ntoArray");
         for(Student i: arr){
             k++;
@@ -56,17 +71,18 @@ public class Main {
         }
 
         System.out.println("Empty? " + treeSet.isEmpty());
-        System.out.println(treeSet.size());
-        //System.out.println(treeSet.iterator());
 
+        System.out.println("Clearing: ");
         treeSet.clear();
-        System.out.println(treeSet.size());
 
+        System.out.println("TreeSet Size: " + treeSet.size());
+        System.out.println("Empty? " + treeSet.isEmpty());
+
+        Iterator<Student> iter3 = treeSet.iterator();
         j=0;
-        Iterator<Student> iter2 = treeSet.iterator();
-        while(iter2.hasNext() ) {
+        while(iter3.hasNext() ) {
             j++;
-            System.out.println(j +")"+iter2.next());
+            System.out.println(j +")"+iter3.next());
         }
     }
 }

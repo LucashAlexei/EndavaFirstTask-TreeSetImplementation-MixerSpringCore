@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class Student implements Comparable<Student> //TODO consider implementing any interfaces necessary for your collection
-{
+public class Student implements Comparable<Student> {
     private String name;
     private LocalDate dateOfBirth;
     private String details;
