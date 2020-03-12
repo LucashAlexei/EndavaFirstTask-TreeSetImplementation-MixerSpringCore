@@ -2,189 +2,66 @@ package com.endava.internship.s2020.treesetimplementation;
 
 import java.util.*;
 
-public class StudentSet implements Set<Student> {
-
-    int count = 0;
-    boolean boolRemove;
-    boolean boolAddAll;
-
-    Node root;
+public class StudentSet<T> implements Set<T> {
+    private Node node = new Node();
 
     StudentSet() {
     }
 
-    //inner Node class
-    static class Node {
-        Student student;
-        Node left;
-        Node right;
-
-        Node(Student student) {
-            this.student = student;
-            right = null;
-            left = null;
-        }
-    }
-
     @Override
     public int size() {
-        return count;
+        return node.getSize();
     }
 
     @Override
     public boolean isEmpty() {
-        return (count == 0);
-    }
-
-    public int compareObjects(Node current, Object student){
-        return student.toString().compareTo(current.student.toString());
+        return node.isEmptyTree();
     }
 
     @Override
     public boolean contains(Object o) {
-            return containsRecursive(root, o);
+        return node.containsObject(o);
     }
 
-    private boolean containsRecursive(Node current, Object student) {
-        if (current == null) {
-            return false;
-        }
-        if (student.equals(current.student)) {
-            return true;
-        }
-        else if(compareObjects(current,student) < 0){
-            return containsRecursive(current.left, student);
-        }
-        else if(compareObjects(current,student) > 0)
-            return containsRecursive(current.right, student);
-
-        return true;
-    }
-
-    public Node addRecursive(Node current, Student student){
-        if(current==null){
-            return new Node(student);
-        }
-
-        int date = student.getDateOfBirth().compareTo(current.student.getDateOfBirth());
-
-        if(compareObjects(current, student)<0){
-            current.left = addRecursive(current.left,student);
-
-        }
-        else if(compareObjects(current, student)>0){
-            current.right = addRecursive(current.right, student);
-
-        }else {
-            if (date < 0) {
-                current.left = addRecursive(current.left, student);
-
-            } else if (date > 0){
-                current.right = addRecursive(current.right, student);
-            }
-            else{
-                count--;
-                return current;
-            }
-        }
-        return current;
-    }
     @Override
-    public boolean add(Student student) {
-        root = addRecursive(root, student);
-        count++;
-        return true;
-    }
-
-    public void print(){
-        printRecursive(root);
-    }
-
-    public void printRecursive(Node root) {
-        if (root != null) {
-            printRecursive(root.left);
-            System.out.println("Tree: "+ root.student);
-            printRecursive(root.right);
-        }
-    }
-
-    private Node deleteRecursive(Node current, Object student) {
-        if (current == null) {
-            return null;
-        }
-
-        if (student.equals(current.student)) {
-            count--;
-            boolRemove = true;
-            if (current.left == null && current.right == null) {
-                return null;
-            }
-            if (current.right == null) {
-                return current.left;
-            }
-            if (current.left == null) {
-                return current.right;
-            }
-        }
-        if (compareObjects(current, student) < 0) {
-            boolRemove = false;
-            current.left = deleteRecursive(current.left, student);
-            return current;
-        }
-        current.right = deleteRecursive(current.right, student);
-        return current;
+    public boolean add(T student) {
+        return node.addObject((Student) student);
     }
 
     @Override
     public boolean remove(Object student) {
-        root = deleteRecursive(root, student);
-        return boolRemove;
+        boolean bool = node.deleteObject(student);
+        return bool;
     }
 
     @Override
-    public Iterator<Student> iterator() {
-        return new Iterator<Student>() {
-            Stack<Student> stack = new Stack<Student>();
-            int check = 0;
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            private Node tmp = node.getRoot();
+            private NodeIterator nodeIterator = new NodeIterator(tmp);
 
             @Override
             public boolean hasNext() {
-                if(check == 0){
-                    iter(root);
-                    check++;
-                }
-                return !stack.empty();
-            }
-
-            private void iter(Node root){
-                if(root == null){
-                    return;
-                }
-                iter(root.right);
-                if(root.student!=null) {
-                    stack.push(root.student);
-                }
-                iter(root.left);
+                return nodeIterator.hasNextRoot();
             }
 
             @Override
-            public Student next() {
-                return stack.pop();
+            public T next() {
+                return (T) nodeIterator.nextRoot();
             }
         };
     }
 
     @Override
     public Student[] toArray() {
-        Student[] array = new Student[count];
-
-        int k=0;
-        Iterator<Student> iter2 = this.iterator();
-        while(iter2.hasNext()) {
-            array[k] = iter2.next();
-            k++;
+        Student[] array = new Student[node.getSize()];
+        Iterator<T> iter2 = iterator();
+        int j = 0;
+        while (iter2.hasNext()) {
+            array[j] = (Student) iter2.next();
+            j++;
         }
-        return (Student[]) array;
+        return array;
     }
 
     @Override
@@ -200,12 +77,11 @@ public class StudentSet implements Set<Student> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Student> collection) {
-        for (Student st : collection) {
-            addRecursive(root, st);
-            count++;
+    public boolean addAll(Collection<? extends T> collection) {
+        boolean boolAddAll = false;
+        for (T st : collection) {
+            boolAddAll = node.addObject((Student) st);
         }
-
         return boolAddAll;
     }
 
@@ -221,19 +97,9 @@ public class StudentSet implements Set<Student> {
         throw new UnsupportedOperationException();
     }
 
-    public void clearRecursive(Node current){
-        if(current == null){
-            return;
-        }
-        clearRecursive(current.right);
-        current.student=null;
-        clearRecursive(current.left);
-    }
-
     @Override
     public void clear() {
-       clearRecursive(root);
-       count=0;
+        node.clearTree();
     }
 }
 
