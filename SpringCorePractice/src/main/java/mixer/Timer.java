@@ -13,5 +13,5 @@ import org.springframework.stereotype.Component;
 @Component
 public class Timer {
 
-    TimerEnum timerEnum;
+    private TimerEnum timerEnum;
 }

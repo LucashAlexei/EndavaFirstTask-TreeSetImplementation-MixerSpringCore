@@ -1,36 +1,43 @@
 package mixer;
 
-import enums.SpeedEnum;
-import enums.TimerEnum;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+
+import javax.validation.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-@ContextConfiguration
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@ContextConfiguration(classes = {CacheConfig.class})
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-class MixerTest extends CacheConfig {
-    @Mock
-    Timer timer;
-    //@Mock Timer timer = Timer timer = Mockito.mock(Timer.class)
-    @Mock
-    Speed speed;
+class MixerTest {
 
-    private MixerProducer mp = new
-            MixerProducer("sumsung", LocalDate.of(2023, 6, 15), "3");
+    @InjectMocks
+    @Autowired
+    Mixer mixerCache;
+
+    @Mock
+    MixerProducer mp;
+
+    @Mock(answer = Answers.RETURNS_SMART_NULLS)
+    static Validator validatorTest;
+
+    @InjectMocks
+    Mixer mixer;
 
     static Validator validator;
 
@@ -38,14 +45,6 @@ class MixerTest extends CacheConfig {
     private static void validationFactory() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-    }
-
-    @Test
-    void shouldGetMixerStateDetails() {
-        when(speed.getSpeedEnum()).thenReturn(SpeedEnum.HIGHT);
-        when(timer.getTimerEnum()).thenReturn(TimerEnum.MINUTES_2);
-        assertThat(speed.getSpeedEnum()).isEqualTo(SpeedEnum.HIGHT);
-        assertThat(timer.getTimerEnum()).isEqualTo(TimerEnum.MINUTES_2);
     }
 
     @Test
@@ -63,12 +62,18 @@ class MixerTest extends CacheConfig {
     }
 
     @Test
-    void shouldReturnCacheEqualToOne() {
-        mixer.getMixerProducerInformation(mp);
-        mixer.getMixerProducerInformation(mp);
-        mixer.getMixerProducerInformation(mp);
-        ConcurrentMap cache = (ConcurrentMap) cacheManager.getCache("report").getNativeCache();
-        assertThat(cache).hasSize(1);
+    void shouldReturnExpectedStringAfterValidation() {
+        MixerProducer mp = new MixerProducer("Lg", LocalDate.of(2015, 6, 15), "6454577");
+        assertThat(mixer.getMixerProducerInformation(mp)).isEqualTo("---------------------------\nProducer: " + "Lg" +
+                "\nProduce Date: " + "2015-06-15"
+                + "\nMixer ID: " + "6454577" + "\n---------------------------");
     }
 
+    @Test
+    void shouldReturnInvocationNumberToCacheMethodEqualToOne() {
+        mixerCache.getMixerProducerInformation(mp);
+        mixerCache.getMixerProducerInformation(mp);
+        mixerCache.getMixerProducerInformation(mp);
+        Mockito.verify(mp, Mockito.times(1)).getIdMixer();
+    }
 }

@@ -14,15 +14,12 @@ public class MixerMain {
         Mixer mixer = context.getBean("mixer", Mixer.class);
         System.out.println(mixer.getState());
 
-        CacheManager cacheManager = context.getBean(CacheManager.class);
+//        MixerConfig mc = context.getBean(MixerConfig.class);
+//        mc.toString();
 
         MixerProducer mp = new MixerProducer("Sumsung", LocalDate.of(2009,06,15),"324252");
         System.out.println(mixer.getMixerProducerInformation(mp));
 
-        System.out.println(cacheManager.getCache("report"));
-
-        System.out.println(mixer.getMixerProducerInformation(mp));
-        System.out.println(cacheManager.getCache("report") + "\n");
 
         context.close();
     }

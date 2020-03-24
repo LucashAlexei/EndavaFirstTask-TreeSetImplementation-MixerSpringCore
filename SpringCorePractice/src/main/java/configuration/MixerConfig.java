@@ -8,44 +8,38 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.support.SimpleCacheManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
-
+import org.springframework.context.annotation.*;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.util.Collections;
 
+@Import(ValidationConfig.class)
 @Configuration
-@PropertySource("classpath:Mixer.properties")
+@PropertySource("classpath:mixer.properties")
 @EnableCaching
 public class MixerConfig {
 
-    @Value("${Speed}")
-    private String speedConfig;
+    @Value("${speed}")
+    private String speedConfig ;
 
-    @Value("${Timer}")
+    @Value("${timer}")
     private String timerConfig;
 
     @Bean
-    public Speed speed(){
-        Speed speed = new Speed();
-        speed.setSpeedEnum(SpeedEnum.chooseSpeed(speedConfig));
-        return speed;
+    public SpeedEnum speed(){
+        return SpeedEnum.chooseSpeed(speedConfig);
     }
 
     @Bean
-    public Timer timer(){
-        Timer timer = new Timer();
-        timer.setTimerEnum(TimerEnum.chooseTime(timerConfig));
-        return timer;
+    public TimerEnum timer(){
+        return TimerEnum.chooseTime(timerConfig);
     }
 
     @Bean
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    public Mixer mixer(Speed speed, Timer timer,Validator validator){
-        return new Mixer(speed,timer,validator);
+    public Mixer mixer(SpeedEnum speed, TimerEnum timer){
+        return new Mixer(speed,timer);
     }
 
     @Bean
